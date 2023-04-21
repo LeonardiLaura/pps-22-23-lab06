@@ -14,9 +14,9 @@ object Solitaire extends App:
     rows.mkString("\n")
 
   def legalMove(pos: (Int, Int), move: (Int, Int)): Boolean =
-    (pos._1 == move._1 && (pos._2 - move._2).abs.equals(3)) ||
-      (pos._2 == move._2 && (pos._1 - move._1).abs.equals(3)) ||
-      ((pos._1 - move._1).abs.equals(2) && (pos._2 - move._2).abs.equals(2))
+    (pos._1 == move._1 && (pos._2 - move._2).abs.equals(2)) ||
+      (pos._2 == move._2 && (pos._1 - move._1).abs.equals(2)) ||
+      ((pos._1 - move._1).abs.equals(1) && (pos._2 - move._2).abs.equals(1))
 
   def placeMarks(w: Int, h: Int): Iterable[Seq[(Int,Int)]] =
     def _placeMarks(size: Int): Iterable[Seq[(Int,Int)]] = size match
@@ -30,12 +30,7 @@ object Solitaire extends App:
           if !marks.contains(mark)
           if legalMove(mark, marks.head)
         yield
-          //println(Seq(mark).concat(marks))
-          //println(render(Seq(mark).concat(marks), w, h))
-          Seq(mark).concat(marks)
-
-    println(_placeMarks(w * h))
+          Seq(mark).appendedAll(marks)
     _placeMarks(w * h)
 
-  println(placeMarks(7, 5))
-  //.foreach(sol => println(render(solution = sol, width = 5, height = 5)))
+  placeMarks(5, 5).foreach(sol => println(render(solution = sol, width = 5, height = 5)))

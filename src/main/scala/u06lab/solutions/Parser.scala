@@ -35,10 +35,17 @@ trait NotTwoConsecutive[T] extends Parser[T]:
     case _ => this.previous = Option.apply(t)
               super.parse(t)
 
-// ???
-// if t==this.previous.get then return false else this.previous = Option.apply(t); super.parse(t)
-
 class NotTwoConsecutiveParser(chars: Set[Char]) extends BasicParser(chars) with NotTwoConsecutive[Char]
+
+
+trait ShortenThenN[T](n: Int) extends Parser[T]:
+  private[this] var size: Int = 0
+  abstract override def parse(t: T): Boolean = size match
+    case _ if n==size => false;
+    case _ => this.size = size+1
+      super.parse(t)
+
+class ShortenThenNParser(chars: Set[Char], n: Int) extends BasicParser(chars) with ShortenThenN[Char](n)
 
 @main def checkParsers(): Unit =
   def parser = new BasicParser(Set('a', 'b', 'c'))
@@ -65,6 +72,13 @@ class NotTwoConsecutiveParser(chars: Set[Char]) extends BasicParser(chars) with 
   println(parserNTCNE.parseAll("XYZ".toList)) // true
   println(parserNTCNE.parseAll("XYYZ".toList)) // false
   println(parserNTCNE.parseAll("".toList)) // false
+  println()
+
+
+  def parserSTN = new BasicParser(Set('X', 'Y', 'Z')) with ShortenThenN[Char](10)
+  println(parserSTN.parseAll("XYZ".toList)) // true
+  println(parserSTN.parseAll("XYYZXXXXXXXXXXXX".toList)) // false
+  //println(parserSTN.parseAll("".toList)) // false
   println()
 
   import Parsers.*
