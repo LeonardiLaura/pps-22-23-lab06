@@ -27,13 +27,32 @@ object ConnectThree extends App:
 
   import Player.*
 
-  def find(board: Board, x: Int, y: Int): Option[Player] = ???
+  def find(board: Board, x: Int, y: Int): Option[Player] = if board.contains(Disk(x,y,X))
+  then Option.apply(X)
+  else if board.contains(Disk(x,y,O))
+  then Option.apply(O)
+  else Option.empty
 
-  def firstAvailableRow(board: Board, x: Int): Option[Int] = ???
+  def firstAvailableRow(board: Board, x: Int): Option[Int] =
+    val listy = board.filter(disk => disk.x.equals(x)).map(disk => disk.y)
+    if listy.isEmpty then Some(0)
+    else
+      val pos: Int = listy.max
+      if pos < bound then Option.apply(pos + 1) else Option.empty
 
-  def placeAnyDisk(board: Board, player: Player): Seq[Board] = ???
+  def placeAnyDisk(board: Board, player: Player): Seq[Board] =
+    val seq = Seq.empty
+    seq.appendedAll(0.to(bound).map(i => Disk(i,firstAvailableRow(board,i).getOrElse(-1),player))
+      .filter(disk => disk.y != -1).map(disk => board.appended(disk)))
 
-  def computeAnyGame(player: Player, moves: Int): LazyList[Game] = ???
+  def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match
+    case 0 => LazyList(Seq[Board]())
+    case _ =>
+      for games <- computeAnyGame(player.other, moves-1)
+        val boards = games.head
+        game = placeAnyDisk(board, player)
+      yield LazyList(game).appendedAll(games)
+
 
   def printBoards(game: Seq[Board]): Unit =
     for
